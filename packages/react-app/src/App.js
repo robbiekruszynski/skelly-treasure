@@ -5,7 +5,6 @@ import { gql } from "apollo-boost";
 import { ethers } from "ethers";
 import { useQuery } from "@apollo/react-hooks";
 import GameScreen from "./components/GameScreen";
-// import { BrowserRouter, Router, Link } from "react-router-dom";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import { IntroScreen } from "./components/IntroScreen";
 

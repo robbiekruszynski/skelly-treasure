@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-
+import logo from "./logo192.png";
 class GameScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -10,12 +10,12 @@ class GameScreen extends React.Component {
       d: false,
       w: false,
       s: false,
-      interval: this.startGame()
-    }
+      interval: this.startGame(),
+    };
   }
 
   componentDidMount() {
-    console.log('hello');
+    console.log("hello");
     document.addEventListener("keydown", this.handleKeyDown);
     document.addEventListener("keyup", this.handleKeyUp);
   }
@@ -31,19 +31,19 @@ class GameScreen extends React.Component {
       let y;
       if (this.state.a) {
         x = this.state.x - 1;
-        this.setState({x});
+        this.setState({ x });
       }
       if (this.state.w) {
         y = this.state.y + 1;
-        this.setState({y});
+        this.setState({ y });
       }
       if (this.state.s) {
         y = this.state.y - 1;
-        this.setState({y});
+        this.setState({ y });
       }
       if (this.state.d) {
         x = this.state.x + 1;
-        this.setState({x});
+        this.setState({ x });
       }
     }, 100);
   }
@@ -53,47 +53,55 @@ class GameScreen extends React.Component {
   }
 
   handleKeyUp = (event) => {
-    switch(event.key) {
-      case("a"):
-        this.setState({a: false})
+    switch (event.key) {
+      case "a":
+        this.setState({ a: false });
         break;
-      case("w"):
-        this.setState({w: false})
+      case "w":
+        this.setState({ w: false });
         break;
-      case("s"):
-        this.setState({s: false})
+      case "s":
+        this.setState({ s: false });
         break;
-      case("d"):
-        this.setState({d: false})
+      case "d":
+        this.setState({ d: false });
         break;
     }
-  }
+  };
 
   handleKeyDown = (event) => {
-    switch(event.key) {
-      case("a"):
-        this.setState({a: true})
+    switch (event.key) {
+      case "a":
+        this.setState({ a: true });
         break;
-      case("w"):
-        this.setState({w: true})
+      case "w":
+        this.setState({ w: true });
         break;
-      case("s"):
-        this.setState({s: true})
+      case "s":
+        this.setState({ s: true });
         break;
-      case("d"):
-        this.setState({d: true})
+      case "d":
+        this.setState({ d: true });
         break;
     }
-  }
+  };
   render() {
     return (
-      <div className="GameScreen" style={{position:'relative'}}>
+      <div className="GameScreen" style={{ position: "relative" }}>
         <button onClick={() => this.endGame()}>Stop!</button>
         <p>Game</p>
         <p>x: {this.state.x}</p>
         <p>y: {this.state.y}</p>
-        <div id="charDiv" style={{position: 'absolute', left: `${this.state.x}%`, bottom: `${this.state.y}%`, width: '100px'}}>
-          <p>Me!</p>
+        <div
+          id="charDiv"
+          style={{
+            position: "absolute",
+            left: `${this.state.x}%`,
+            bottom: `${this.state.y}%`,
+            width: "100px",
+          }}
+        >
+          <img src={logo} alt="" />
         </div>
       </div>
     );

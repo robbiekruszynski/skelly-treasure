@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 import { useQuery } from "@apollo/react-hooks";
 import GameScreen from "./components/GameScreen";
 // import { BrowserRouter, Router, Link } from "react-router-dom";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import { IntroScreen } from "./components/IntroScreen";
 
 import "./App.css";
@@ -14,8 +14,11 @@ import "./App.css";
 function App() {
   return (
     <Router>
-      <Route path="/game" component={GameScreen} />
-      <Route path="/home" component={IntroScreen} />
+      <Switch>
+        <Route path="/game" exact component={GameScreen} />
+        <Route path="/home" exact component={IntroScreen} />
+        <Route path="/" render={() => <div>404</div>} />
+      </Switch>
     </Router>
   );
 }

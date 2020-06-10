@@ -1,6 +1,6 @@
 import React from "react";
 import { ethers } from "ethers";
-
+import "./IntroScreen.scss";
 import {
   BrowserRouter as Router,
   Link,
@@ -12,8 +12,8 @@ export const IntroScreen = ({ history }) => {
   let ethereum = window.ethereum;
 
   return (
-    <div>
-      <p>Intro Screen Render</p>
+    <div className="IntroBody">
+      <p>Skelly Treasure</p>
       <Link>
         <button
           onClick={() => {

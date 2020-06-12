@@ -13,7 +13,8 @@ class GameScreen extends React.Component {
       mostRecentHorizontal: 'none',
       mostRecentVertical: 'none',
       charPosition: '',
-      interval: this.startGame()
+      interval: this.startGame(),
+      timer: 0
     }
   }
 
@@ -48,8 +49,10 @@ class GameScreen extends React.Component {
         x = this.state.x + 1;
         this.setState({x});
       }
+      let timer = this.state.timer + 1;
+      this.setState({timer})
       this.positionChar();
-    }, 100);
+    }, 50);
   }
 
   endGame() {
@@ -142,6 +145,7 @@ class GameScreen extends React.Component {
         break;
     }
     const position = {
+      0: 'none',
       1: 'west',
       2: 'east',
       4: 'north',
@@ -151,7 +155,12 @@ class GameScreen extends React.Component {
       9: 'southwest',
       10: 'southeast'
     }
-    this.setState({charPosition: position[outputNum]})
+
+    // PLACEHOLDER LOGIC -- With sprites added, position[outputNum] could be an array of images for the avatar. Then it could just be:
+    // let charPosition = position[outputNum][Math.floor(this.state.timer / 4) % position[outputNum].length]
+    // I just think this looks *cool*
+    let shiftedPos = position[outputNum].slice(Math.floor(this.state.timer / 4) % position[outputNum].length) + position[outputNum].slice(0,Math.floor(this.state.timer / 4) % position[outputNum].length)
+    this.setState({charPosition: shiftedPos});
   }
 
   render() {

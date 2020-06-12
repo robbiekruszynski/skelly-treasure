@@ -13,18 +13,21 @@ class GameScreen extends React.Component {
       mostRecentHorizontal: 'none',
       mostRecentVertical: 'none',
       charPosition: '',
-      interval: this.startGame()
+      interval: this.startGame(),
+      timer: 0
     }
   }
 
   componentDidMount() {
     document.addEventListener("keydown", this.handleKeyDown);
     document.addEventListener("keyup", this.handleKeyUp);
+    this.renderElements();
   }
 
   componentWillUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
     document.removeEventListener("keyup", this.handleKeyUp);
+    this.endGame();
   }
 
   startGame() {
@@ -47,12 +50,32 @@ class GameScreen extends React.Component {
         x = this.state.x + 1;
         this.setState({x});
       }
+      let timer = this.state.timer + 1;
+      this.setState({timer})
       this.positionChar();
-    }, 100);
+    }, 50);
   }
 
   endGame() {
     clearInterval(this.state.interval);
+  }
+
+  renderElements() {
+    this.renderChests(10);
+  }
+
+  renderChests(chestCount) {
+    let userChar = document.querySelector('#charDiv');
+    for (let i = 0; i < chestCount; i++) {
+      let div = document.createElement('div');
+      div.innerHTML = '|_|';
+      div.id = `chest${i}`;
+      div.style.position = "absolute";
+      div.style.left = `${Math.floor(Math.random() * 100)}%`;
+      div.style.bottom = `${Math.floor(Math.random() * 100)}%`;
+      div.style.width = "100px";
+      userChar.parentNode.insertBefore( div, userChar );
+    }
   }
 
   handleKeyUp = (event) => {
@@ -109,16 +132,17 @@ class GameScreen extends React.Component {
     }
   }
 
-  // a: 1
-  // d: 2
-  // w: 4
-  // aw: 5
-  // dw: 6
-  // s: 8
-  // as: 9
-  // ds: 10
-
+  
   positionChar() {
+    // VALUES FOR outputNum BY KEYPRESS
+    // a: 1
+    // d: 2
+    // w: 4
+    // aw: 5
+    // dw: 6
+    // s: 8
+    // as: 9
+    // ds: 10
     let outputNum = 0;
     switch(this.state.mostRecentHorizontal) {
       case('a'):
@@ -141,6 +165,7 @@ class GameScreen extends React.Component {
         break;
     }
     const position = {
+      0: 'none',
       1: 'west',
       2: 'east',
       4: 'north',
@@ -150,7 +175,12 @@ class GameScreen extends React.Component {
       9: 'southwest',
       10: 'southeast'
     }
-    this.setState({charPosition: position[outputNum]})
+
+    // PLACEHOLDER LOGIC -- With sprites added, position[outputNum] could be an array of images for the avatar. Then it could just be:
+    // let charPosition = position[outputNum][Math.floor(this.state.timer / 4) % position[outputNum].length]
+    // I just think this looks *cool*
+    let shiftedPos = position[outputNum].slice(Math.floor(this.state.timer / 4) % position[outputNum].length) + position[outputNum].slice(0,Math.floor(this.state.timer / 4) % position[outputNum].length)
+    this.setState({charPosition: shiftedPos});
   }
 
   render() {

@@ -1,5 +1,5 @@
 .IntroBody {
-  border: 10px solid red;
+  background-size: cover;
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -7,5 +7,6 @@
   align-items: center;
   p {
     border: 1px solid green;
+    // color: white;
   }
 }

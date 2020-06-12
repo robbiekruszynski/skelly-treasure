@@ -25,6 +25,7 @@ class GameScreen extends React.Component {
   componentWillUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
     document.removeEventListener("keyup", this.handleKeyUp);
+    this.endGame();
   }
 
   startGame() {

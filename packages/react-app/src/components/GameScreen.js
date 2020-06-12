@@ -21,6 +21,7 @@ class GameScreen extends React.Component {
   componentDidMount() {
     document.addEventListener("keydown", this.handleKeyDown);
     document.addEventListener("keyup", this.handleKeyUp);
+    this.renderElements();
   }
 
   componentWillUnmount() {
@@ -57,6 +58,24 @@ class GameScreen extends React.Component {
 
   endGame() {
     clearInterval(this.state.interval);
+  }
+
+  renderElements() {
+    this.renderChests(10);
+  }
+
+  renderChests(chestCount) {
+    let userChar = document.querySelector('#charDiv');
+    for (let i = 0; i < chestCount; i++) {
+      let div = document.createElement('div');
+      div.innerHTML = '|_|';
+      div.id = `chest${i}`;
+      div.style.position = "absolute";
+      div.style.left = `${Math.floor(Math.random() * 100)}%`;
+      div.style.bottom = `${Math.floor(Math.random() * 100)}%`;
+      div.style.width = "100px";
+      userChar.parentNode.insertBefore( div, userChar );
+    }
   }
 
   handleKeyUp = (event) => {
@@ -113,16 +132,17 @@ class GameScreen extends React.Component {
     }
   }
 
-  // a: 1
-  // d: 2
-  // w: 4
-  // aw: 5
-  // dw: 6
-  // s: 8
-  // as: 9
-  // ds: 10
-
+  
   positionChar() {
+    // VALUES FOR outputNum BY KEYPRESS
+    // a: 1
+    // d: 2
+    // w: 4
+    // aw: 5
+    // dw: 6
+    // s: 8
+    // as: 9
+    // ds: 10
     let outputNum = 0;
     switch(this.state.mostRecentHorizontal) {
       case('a'):

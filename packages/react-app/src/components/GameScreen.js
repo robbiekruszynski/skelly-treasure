@@ -14,7 +14,8 @@ class GameScreen extends React.Component {
       mostRecentVertical: 'none',
       charPosition: '',
       interval: this.startGame(),
-      timer: 0
+      timer: 0,
+      numChests: 10
     }
   }
 
@@ -61,21 +62,24 @@ class GameScreen extends React.Component {
   }
 
   renderElements() {
-    this.renderChests(10);
+    this.renderChests();
   }
 
-  renderChests(chestCount) {
+  renderChests() {
     let userChar = document.querySelector('#charDiv');
-    for (let i = 0; i < chestCount; i++) {
+    let chestsClosed = [];
+    for (let i = 0; i < this.state.numChests; i++) {
       let div = document.createElement('div');
       div.innerHTML = '|_|';
       div.id = `chest${i}`;
       div.style.position = "absolute";
-      div.style.left = `${Math.floor(Math.random() * 100)}%`;
+      div.style.left = `${Math.floor(Math.random() * 100)}%`; // '65%'
       div.style.bottom = `${Math.floor(Math.random() * 100)}%`;
-      div.style.width = "100px";
+      div.style.width = '100px';
       userChar.parentNode.insertBefore( div, userChar );
+      chestsClosed.push(true);
     }
+    this.setState({chestsClosed});
   }
 
   handleKeyUp = (event) => {
@@ -127,9 +131,27 @@ class GameScreen extends React.Component {
         this.setState({d: true});
         this.setState({mostRecentHorizontal: 'd'});
         break;
+      case(" "): 
+        this.checkForChests();
+        break;
       default:
         break;
     }
+  }
+
+  checkForChests() {
+    for (let i = 0; i < this.state.numChests; i++) {
+      let chest = document.querySelector(`#chest${i}`);
+      // "87%" -- > 87
+      if (Math.pow(Math.abs(parseInt(chest.style.left) - this.state.x), 2) + Math.pow(Math.abs(parseInt(chest.style.bottom) - this.state.y), 2) < Math.pow(5, 2) && this.state.chestsClosed[i]) {
+        this.startQuestion();
+      }
+    }
+  }
+
+  startQuestion() {
+    let modal = document.querySelector("#questionModal");
+    modal.style.display = "block";
   }
 
   
@@ -186,10 +208,22 @@ class GameScreen extends React.Component {
   render() {
     return (
       <div className="GameScreen" style={{ position: "relative" }}>
-        <button onClick={() => this.endGame()}>Stop!</button>
+        <button onClick={() => this.endGame()}>Pause</button>
         <p>Game</p>
-        <p>x: {this.state.x}</p>
-        <p>y: {this.state.y}</p>
+        <div 
+          id="questionModal"
+          style={{
+            position: "aboslute",
+            display: "none",
+            marginLeft: "15%",
+            marginBottom: "15%",
+            width: "30%",
+            height: "30%",
+            backgroundColor: "rgba(0,0,0,0.7)"
+          }}
+        >
+          <p>Question!</p>
+        </div>
         <div
           id="charDiv"
           style={{

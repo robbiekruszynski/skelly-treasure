@@ -15,8 +15,8 @@ function App() {
     <Router>
       <Switch>
         <Route path="/game" exact component={GameScreen} />
-        <Route path="/home" exact component={IntroScreen} />
-        <Route path="/" exact render={() => <div>404</div>} />
+        <Route path="/" exact component={IntroScreen} />
+        <Route path="/404" exact render={() => <div>404</div>} />
       </Switch>
     </Router>
   );

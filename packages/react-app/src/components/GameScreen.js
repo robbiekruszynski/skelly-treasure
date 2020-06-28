@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import logo from "./logo192.png";
+import { questions } from "./Questions.js";
+
 class GameScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -15,14 +17,17 @@ class GameScreen extends React.Component {
       charPosition: '',
       interval: this.startGame(),
       timer: 0,
-      numChests: 10
+      numChests: 10,
+      moving: true,
+      prompts: [],
+      choices: []
     }
   }
 
   componentDidMount() {
     document.addEventListener("keydown", this.handleKeyDown);
     document.addEventListener("keyup", this.handleKeyUp);
-    this.renderElements();
+    this.prepGame();
   }
 
   componentWillUnmount() {
@@ -35,21 +40,23 @@ class GameScreen extends React.Component {
     return setInterval(() => {
       let x;
       let y;
-      if (this.state.a) {
-        x = this.state.x - 1;
-        this.setState({x});
-      }
-      if (this.state.w) {
-        y = this.state.y + 1;
-        this.setState({y});
-      }
-      if (this.state.s) {
-        y = this.state.y - 1;
-        this.setState({y});
-      }
-      if (this.state.d) {
-        x = this.state.x + 1;
-        this.setState({x});
+      if (this.state.moving) {
+        if (this.state.a) {
+          x = this.state.x - 1;
+          this.setState({x});
+        }
+        if (this.state.w) {
+          y = this.state.y + 1;
+          this.setState({y});
+        }
+        if (this.state.s) {
+          y = this.state.y - 1;
+          this.setState({y});
+        }
+        if (this.state.d) {
+          x = this.state.x + 1;
+          this.setState({x});
+        }
       }
       let timer = this.state.timer + 1;
       this.setState({timer})
@@ -61,8 +68,9 @@ class GameScreen extends React.Component {
     clearInterval(this.state.interval);
   }
 
-  renderElements() {
+  prepGame() {
     this.renderChests();
+    this.randomizeQuestions();
   }
 
   renderChests() {
@@ -80,6 +88,19 @@ class GameScreen extends React.Component {
       chestsClosed.push(true);
     }
     this.setState({chestsClosed});
+  }
+
+  randomizeQuestions() {
+    let prompts = [];
+    let choices = [];
+    questions
+      .sort(() => Math.random() - 0.5)
+      .forEach(function(q) {
+        prompts.push(q.question);
+        choices.push(q.responses);
+      });
+    this.setState({ prompts });
+    this.setState({ choices });
   }
 
   handleKeyUp = (event) => {
@@ -150,10 +171,16 @@ class GameScreen extends React.Component {
   }
 
   startQuestion() {
+    this.setState({moving: false});
     let modal = document.querySelector("#questionModal");
     modal.style.display = "block";
   }
 
+  exitQuestion() {
+    this.setState({moving: true});
+    let modal = document.querySelector("#questionModal");
+    modal.style.display = "none";
+  }
   
   positionChar() {
     // VALUES FOR outputNum BY KEYPRESS
@@ -222,6 +249,7 @@ class GameScreen extends React.Component {
             backgroundColor: "rgba(0,0,0,0.7)"
           }}
         >
+          <p onClick={() => this.exitQuestion()}>close</p>
           <p>Question!</p>
         </div>
         <div

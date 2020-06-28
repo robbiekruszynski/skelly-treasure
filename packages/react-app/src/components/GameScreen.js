@@ -23,6 +23,7 @@ class GameScreen extends React.Component {
       choices: [],
       prompt: "",
       choicesDiv: "",
+      selectedAnswers: []
     }
   }
 
@@ -195,19 +196,38 @@ class GameScreen extends React.Component {
 
   showQuestion() {
     const prompt = this.state.prompts[0];
+    let selectedAnswers = [];
     const choicesDiv = this.state.choices[0].map((choice, key) => {
-      return <div onClick={() => this.toggleAnswer(key)} className="choice" key={key}><p>{choice.answer}</p></div>;
+      selectedAnswers.push(false);
+    return <div onClick={() => this.toggleAnswer(key)} className="choice" key={key}><p>{choice.answer}</p></div>;
     });
+    this.setState({ selectedAnswers });
     this.setState({ prompt });
     this.setState({ choicesDiv });
   }
 
   toggleAnswer(answerId) {
-
+    let selectedAnswers = [...this.state.selectedAnswers];
+    selectedAnswers[answerId] = !selectedAnswers[answerId];
+    this.setState({ selectedAnswers });
   }
 
   checkAnswers() {
-    
+    const correctAnswers = this.state.choices[0].map((choice) => {
+      return choice.correct;
+    });
+    let correct = true;
+    for(let i = 0; i < this.state.selectedAnswers.length; i++) {
+      if (correctAnswers[i] !== this.state.selectedAnswers[i]) {
+        correct = false;
+      }
+    }
+    if (correct) {
+      console.log("Correct!");
+    } else {
+      console.log("Incorrect answers detected, or correct answers missing.");
+    }
+    this.exitQuestion();
   }
   
   positionChar() {

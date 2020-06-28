@@ -20,7 +20,9 @@ class GameScreen extends React.Component {
       numChests: 10,
       moving: true,
       prompts: [],
-      choices: []
+      choices: [],
+      prompt: "",
+      choicesDiv: "",
     }
   }
 
@@ -172,14 +174,40 @@ class GameScreen extends React.Component {
 
   startQuestion() {
     this.setState({moving: false});
-    let modal = document.querySelector("#questionModal");
+    const modal = document.querySelector("#questionModal");
     modal.style.display = "block";
+    this.showQuestion();
   }
 
   exitQuestion() {
     this.setState({moving: true});
+    let prompts = [...this.state.prompts];
+    const firstPrompt = prompts.shift();
+    prompts.push(firstPrompt);
+    let choices = [...this.state.choices];
+    const firstChoice = choices.shift();
+    choices.push(firstChoice);
     let modal = document.querySelector("#questionModal");
     modal.style.display = "none";
+    this.setState({prompts});
+    this.setState({choices});
+  }
+
+  showQuestion() {
+    const prompt = this.state.prompts[0];
+    const choicesDiv = this.state.choices[0].map((choice, key) => {
+      return <div onClick={() => this.toggleAnswer(key)} className="choice" key={key}><p>{choice.answer}</p></div>;
+    });
+    this.setState({ prompt });
+    this.setState({ choicesDiv });
+  }
+
+  toggleAnswer(answerId) {
+
+  }
+
+  checkAnswers() {
+    
   }
   
   positionChar() {
@@ -250,7 +278,9 @@ class GameScreen extends React.Component {
           }}
         >
           <p onClick={() => this.exitQuestion()}>close</p>
-          <p>Question!</p>
+          <p>{this.state.prompt}</p>
+          <div>{this.state.choicesDiv}</div>
+          <p onClick={() => this.checkAnswers()}>Submit</p>
         </div>
         <div
           id="charDiv"

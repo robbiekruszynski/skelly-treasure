@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import logo from "./logo192.png";
+import { questions } from "./Questions.js";
+
 class GameScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -15,14 +17,20 @@ class GameScreen extends React.Component {
       charPosition: '',
       interval: this.startGame(),
       timer: 0,
-      numChests: 10
+      numChests: 10,
+      moving: true,
+      prompts: [],
+      choices: [],
+      prompt: "",
+      choicesDiv: "",
+      selectedAnswers: []
     }
   }
 
   componentDidMount() {
     document.addEventListener("keydown", this.handleKeyDown);
     document.addEventListener("keyup", this.handleKeyUp);
-    this.renderElements();
+    this.prepGame();
   }
 
   componentWillUnmount() {
@@ -35,21 +43,23 @@ class GameScreen extends React.Component {
     return setInterval(() => {
       let x;
       let y;
-      if (this.state.a) {
-        x = this.state.x - 1;
-        this.setState({x});
-      }
-      if (this.state.w) {
-        y = this.state.y + 1;
-        this.setState({y});
-      }
-      if (this.state.s) {
-        y = this.state.y - 1;
-        this.setState({y});
-      }
-      if (this.state.d) {
-        x = this.state.x + 1;
-        this.setState({x});
+      if (this.state.moving) {
+        if (this.state.a) {
+          x = this.state.x - 1;
+          this.setState({x});
+        }
+        if (this.state.w) {
+          y = this.state.y + 1;
+          this.setState({y});
+        }
+        if (this.state.s) {
+          y = this.state.y - 1;
+          this.setState({y});
+        }
+        if (this.state.d) {
+          x = this.state.x + 1;
+          this.setState({x});
+        }
       }
       let timer = this.state.timer + 1;
       this.setState({timer})
@@ -61,8 +71,9 @@ class GameScreen extends React.Component {
     clearInterval(this.state.interval);
   }
 
-  renderElements() {
+  prepGame() {
     this.renderChests();
+    this.randomizeQuestions();
   }
 
   renderChests() {
@@ -80,6 +91,19 @@ class GameScreen extends React.Component {
       chestsClosed.push(true);
     }
     this.setState({chestsClosed});
+  }
+
+  randomizeQuestions() {
+    let prompts = [];
+    let choices = [];
+    questions
+      .sort(() => Math.random() - 0.5)
+      .forEach(function(q) {
+        prompts.push(q.question);
+        choices.push(q.responses);
+      });
+    this.setState({ prompts });
+    this.setState({ choices });
   }
 
   handleKeyUp = (event) => {
@@ -150,10 +174,61 @@ class GameScreen extends React.Component {
   }
 
   startQuestion() {
-    let modal = document.querySelector("#questionModal");
+    this.setState({moving: false});
+    const modal = document.querySelector("#questionModal");
     modal.style.display = "block";
+    this.showQuestion();
   }
 
+  exitQuestion() {
+    this.setState({moving: true});
+    let prompts = [...this.state.prompts];
+    const firstPrompt = prompts.shift();
+    prompts.push(firstPrompt);
+    let choices = [...this.state.choices];
+    const firstChoice = choices.shift();
+    choices.push(firstChoice);
+    let modal = document.querySelector("#questionModal");
+    modal.style.display = "none";
+    this.setState({prompts});
+    this.setState({choices});
+  }
+
+  showQuestion() {
+    const prompt = this.state.prompts[0];
+    let selectedAnswers = [];
+    const choicesDiv = this.state.choices[0].map((choice, key) => {
+      selectedAnswers.push(false);
+    return <div onClick={() => this.toggleAnswer(key)} className="choice" key={key}><p>{choice.answer}</p></div>;
+    });
+    this.setState({ selectedAnswers });
+    this.setState({ prompt });
+    this.setState({ choicesDiv });
+  }
+
+  toggleAnswer(answerId) {
+    let selectedAnswers = [...this.state.selectedAnswers];
+    selectedAnswers[answerId] = !selectedAnswers[answerId];
+    this.setState({ selectedAnswers });
+  }
+
+  checkAnswers() {
+    const correctAnswers = this.state.choices[0].map((choice) => {
+      return choice.correct;
+    });
+    let correct = true;
+    for(let i = 0; i < this.state.selectedAnswers.length; i++) {
+      if (correctAnswers[i] !== this.state.selectedAnswers[i]) {
+        correct = false;
+      }
+    }
+    if (correct) {
+      console.log("Correct!");
+    } else {
+      console.log("Incorrect answers detected, or correct answers missing.");
+    }
+    this.exitQuestion();
+  }
   
   positionChar() {
     // VALUES FOR outputNum BY KEYPRESS
@@ -222,7 +297,10 @@ class GameScreen extends React.Component {
             backgroundColor: "rgba(0,0,0,0.7)"
           }}
         >
-          <p>Question!</p>
+          <p onClick={() => this.exitQuestion()}>close</p>
+          <p>{this.state.prompt}</p>
+          <div>{this.state.choicesDiv}</div>
+          <p onClick={() => this.checkAnswers()}>Submit</p>
         </div>
         <div
           id="charDiv"

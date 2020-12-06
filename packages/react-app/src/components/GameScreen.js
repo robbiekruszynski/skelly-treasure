@@ -6,6 +6,7 @@ class GameScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      flashMessage: "Move with WASD, Open chests with Space, Answer questions to kill the monster!",
       x: 50,
       y: 50,
       a: false,
@@ -302,9 +303,12 @@ class GameScreen extends React.Component {
     // update monster state to track player, absolute value change of pixel distance being the monsterSpeed
     let deltaX = Math.round(this.state.x - this.state.monsterX);
     let deltaY = Math.round(this.state.y - this.state.monsterY);
-    let sign = [deltaX == 0 ? 0 : Math.round(deltaX / Math.abs(deltaX)), deltaY == 0 ? 0 : Math.round(deltaY / Math.abs(deltaY))]
-    let newMonsterX = this.state.monsterX + sign[0] * this.state.monsterSpeed;
-    let newMonsterY = this.state.monsterY + sign[1] * this.state.monsterSpeed;
+    let magnitudeVector = [Math.abs(deltaX), Math.abs(deltaY)];
+    let magnitude = magnitudeVector[0] + magnitudeVector[1];
+    let sign = [deltaX == 0 ? 0 : Math.round(deltaX / magnitudeVector[0]), deltaY == 0 ? 0 : Math.round(deltaY / magnitudeVector[0])]
+    let ratio = magnitude == 0 ? [0,0] : [deltaX/magnitude, deltaY/magnitude];
+    let newMonsterX = this.state.monsterX + ratio[0] * this.state.monsterSpeed;
+    let newMonsterY = this.state.monsterY + ratio[1] * this.state.monsterSpeed;
     this.setState({monsterX: newMonsterX, monsterY: newMonsterY});
   }
 
@@ -312,7 +316,7 @@ class GameScreen extends React.Component {
     return (
       <div className="GameScreen" style={{ position: "relative", top: "0px" }}>
         <button onClick={() => this.endGame()}>Pause</button>
-        <p>Game</p>
+        <p>{this.state.flashMessage}</p>
         <div 
           id="questionModal"
           style={{

@@ -48,39 +48,38 @@ class GameScreen extends React.Component {
   startGame() {
     return setInterval(() => {
       this.checkForEndGame();
-      let x;
-      let y;
+      let x = this.state.x;
+      let y = this.state.y;
+      let deltaX = 0;
+      let deltaY = 0;
       if (this.state.moving) {
         if (this.state.a) {
-          x = this.state.x - 1;
+          deltaX -= 1;
         }
         if (this.state.w) {
-          y = this.state.y + 1;
+          deltaY += 1;
         }
         if (this.state.s) {
-          y = this.state.y - 1;
+          deltaY -= 1;
         }
         if (this.state.d) {
-          x = this.state.x + 1;
+          deltaX += 1;
         }
-        if (x && x < 0){
-          x = 0;
-        } else if (x && x > 100) {
-          x = 100;
+        if ((x <= 0 && deltaX < 0) || (x >= 100 && deltaX > 0)){
+          deltaX = 0;
         }
-        if (y && y < 0){
-          y = 0;
-        } else if (y && y > 100) {
-          y = 100;
+        if ((y <= 0 && deltaY < 0) || (y >= 100 && deltaY > 0)){
+          deltaY = 0;
         }
-        if (x) this.setState({x});
-        if (y) this.setState({y});
+        if (deltaX != 0) x = this.state.x + (deltaX/(Math.abs(deltaX) + Math.abs(deltaY)));
+        if (deltaY != 0) y = this.state.y + (deltaY/(Math.abs(deltaX) + Math.abs(deltaY)));
+        if (x != this.state.x || y != this.state.y) this.setState({x, y});
         this.updateMonster();
       }
       let timer = this.state.timer + 1;
       this.setState({timer})
       this.positionChar();
-    }, 50);
+    }, 33);
   }
 
   checkForEndGame() {
@@ -245,7 +244,7 @@ class GameScreen extends React.Component {
     }
     if (correct) {
       this.handleCorrectAnswer();
-      this.setState({flashMessage: "Correct!"});
+      this.setState({flashMessage: "Correct -- The monster is stunned!"});
     } else {
       this.setState({flashMessage: "Incorrect answers detected, or correct answers missing."});
     }
@@ -367,8 +366,8 @@ class GameScreen extends React.Component {
           id="charDiv"
           style={{
             position: "absolute",
-            left: `${this.state.x}%`,
-            bottom: `${this.state.y}%`,
+            left: `${Math.floor(this.state.x)}%`,
+            bottom: `${Math.floor(this.state.y)}%`,
             width: "100px",
             height: "100px",
             border: "1px solid blue"

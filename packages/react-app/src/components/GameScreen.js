@@ -23,6 +23,7 @@ class GameScreen extends React.Component {
       interval: this.startGame(),
       timer: 0,
       numChests: 10,
+      currentChest: undefined,
       moving: true,
       prompts: [],
       choices: [],
@@ -187,6 +188,7 @@ class GameScreen extends React.Component {
       let chest = document.querySelector(`#chest${i}`);
       // "87%" -- > 87
       if (Math.pow(Math.abs(parseInt(chest.style.left) - this.state.x), 2) + Math.pow(Math.abs(parseInt(chest.style.bottom) - this.state.y), 2) < Math.pow(5, 2) && this.state.chestsClosed[i]) {
+        this.setState({currentChest: i});
         this.startQuestion();
       }
     }
@@ -242,9 +244,12 @@ class GameScreen extends React.Component {
       }
     }
     if (correct) {
-      console.log("Correct!");
+      let chestList = [...this.state.chestsClosed];
+      chestList[this.state.currentChest] = false;
+      document.getElementById(`chest${this.state.currentChest}`).innerHTML = '|X|';
+      this.setState({flashMessage: "Correct!"});
     } else {
-      console.log("Incorrect answers detected, or correct answers missing.");
+      this.setState({flashMessage: "Incorrect answers detected, or correct answers missing."});
     }
     this.exitQuestion();
   }
@@ -312,9 +317,9 @@ class GameScreen extends React.Component {
 
   render() {
     return (
-      <div className="GameScreen" style={{ position: "relative", top: "0px" }}>
+      <div className="GameScreen" style={{ position: "relative"}}>
         <button onClick={() => this.endGame()}>Pause</button>
-        <p>{this.state.flashMessage}</p>
+        <p style={{ margin: "0"}}>{this.state.flashMessage}</p>
         <div 
           id="questionModal"
           style={{

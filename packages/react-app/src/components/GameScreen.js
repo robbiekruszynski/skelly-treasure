@@ -13,7 +13,7 @@ class GameScreen extends React.Component {
       w: false,
       s: false,
       monsterX: 50,
-      monsterY: 10,
+      monsterY: 90,
       monsterSpeed: 0.5,
       monsterAvatar: "<0_0>",
       mostRecentHorizontal: 'none',
@@ -50,20 +50,28 @@ class GameScreen extends React.Component {
       if (this.state.moving) {
         if (this.state.a) {
           x = this.state.x - 1;
-          this.setState({x});
         }
         if (this.state.w) {
           y = this.state.y + 1;
-          this.setState({y});
         }
         if (this.state.s) {
           y = this.state.y - 1;
-          this.setState({y});
         }
         if (this.state.d) {
           x = this.state.x + 1;
-          this.setState({x});
         }
+        if (x && x < 0){
+          x = 0;
+        } else if (x && x > 100) {
+          x = 100;
+        }
+        if (y && y < 0){
+          y = 0;
+        } else if (y && y > 100) {
+          y = 100;
+        }
+        if (x) this.setState({x});
+        if (y) this.setState({y});
       }
       let timer = this.state.timer + 1;
       this.setState({timer})
@@ -287,6 +295,8 @@ class GameScreen extends React.Component {
 
   updateMonster() {
     // update monster state to track player, absolute value change of pixel distance being the monsterSpeed
+    let deltaX = this.state.x - this.state.monsterX;
+    let deltaY = this.state.y - this.state.monsterY;
   }
 
   render() {
@@ -318,6 +328,8 @@ class GameScreen extends React.Component {
             left: `${Math.floor(this.state.monsterX)}%`,
             bottom: `${Math.floor(this.state.monsterY)}%`,
             width: "100px",
+            height: "100px",
+            border: "1px solid red"
           }}
         >
           <p>{this.state.monsterAvatar}</p>
@@ -329,9 +341,16 @@ class GameScreen extends React.Component {
             left: `${this.state.x}%`,
             bottom: `${this.state.y}%`,
             width: "100px",
+            height: "100px",
+            border: "1px solid blue"
           }}
         >
-          <img src={logo} alt="" />
+          <img 
+            src={logo} 
+            alt="" 
+            style={{
+              width: "100%",
+            }}/>
           <p>{this.state.charPosition}</p>
         </div>
       </div>

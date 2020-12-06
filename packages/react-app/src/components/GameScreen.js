@@ -12,6 +12,9 @@ class GameScreen extends React.Component {
       d: false,
       w: false,
       s: false,
+      monsterX: 50,
+      monsterY: 10,
+      monsterAvatar: "<0_0>",
       mostRecentHorizontal: 'none',
       mostRecentVertical: 'none',
       charPosition: '',
@@ -301,6 +304,17 @@ class GameScreen extends React.Component {
           <p>{this.state.prompt}</p>
           <div>{this.state.choicesDiv}</div>
           <p onClick={() => this.checkAnswers()}>Submit</p>
+        </div>
+        <div
+          id="monsterDiv"
+          style={{
+            position: "absolute",
+            left: `${Math.floor(this.state.monsterX)}%`,
+            bottom: `${Math.floor(this.state.monsterY)}%`,
+            width: "100px",
+          }}
+        >
+          <p>{this.state.monsterAvatar}</p>
         </div>
         <div
           id="charDiv"

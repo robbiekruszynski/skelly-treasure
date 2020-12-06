@@ -257,8 +257,7 @@ class GameScreen extends React.Component {
     chestList[this.state.currentChest] = false;
     document.getElementById(`chest${this.state.currentChest}`).innerHTML = '|X|';
     this.setState({chestsClosed: chestList });
-    this.updateMonster(-10);
-    this.setState({monsterSpeed: this.state.monsterSpeed + 0.1})
+    this.knockAndStun();
   }
   
   positionChar() {
@@ -320,6 +319,13 @@ class GameScreen extends React.Component {
     let newMonsterX = this.state.monsterX + ratio[0] * (this.state.monsterSpeed + direction);
     let newMonsterY = this.state.monsterY + ratio[1] * (this.state.monsterSpeed + direction);
     this.setState({monsterX: newMonsterX, monsterY: newMonsterY});
+  }
+
+  knockAndStun() {
+    this.updateMonster(-10);
+    const monsterSpeed = this.state.monsterSpeed + 0.1;
+    this.setState({monsterSpeed: 0});
+    setTimeout(() => this.setState({monsterSpeed}), 1000);
   }
 
   render() {

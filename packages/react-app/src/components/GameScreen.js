@@ -21,6 +21,7 @@ class GameScreen extends React.Component {
       mostRecentVertical: 'none',
       charPosition: '',
       interval: this.startGame(),
+      gameOver: false,
       timer: 0,
       numChests: 10,
       currentChest: undefined,
@@ -48,39 +49,42 @@ class GameScreen extends React.Component {
   startGame() {
     return setInterval(() => {
       this.checkForEndGame();
-      let x = this.state.x;
-      let y = this.state.y;
-      let deltaX = 0;
-      let deltaY = 0;
-      if (this.state.moving) {
-        if (this.state.a) {
-          deltaX -= 1;
-        }
-        if (this.state.w) {
-          deltaY += 1;
-        }
-        if (this.state.s) {
-          deltaY -= 1;
-        }
-        if (this.state.d) {
-          deltaX += 1;
-        }
-        if ((x <= 0 && deltaX < 0) || (x >= 100 && deltaX > 0)){
-          deltaX = 0;
-        }
-        if ((y <= 0 && deltaY < 0) || (y >= 100 && deltaY > 0)){
-          deltaY = 0;
-        }
-        if (deltaX != 0) x = this.state.x + (deltaX/(Math.abs(deltaX) + Math.abs(deltaY)));
-        if (deltaY != 0) y = this.state.y + (deltaY/(Math.abs(deltaX) + Math.abs(deltaY)));
-        if (x != this.state.x || y != this.state.y) this.setState({x, y});
-        this.updateMonster();
-      }
+      this.handleMovement();
       let timer = this.state.timer + 1;
       this.setState({timer})
       this.positionChar();
     }, 33);
   }
+
+  handleMovement() {
+    let x = this.state.x;
+    let y = this.state.y;
+    let deltaX = 0;
+    let deltaY = 0;
+    if (this.state.moving) {
+      if (this.state.a) {
+        deltaX -= 1;
+      }
+      if (this.state.w) {
+        deltaY += 1;
+      }
+      if (this.state.s) {
+        deltaY -= 1;
+      }
+      if (this.state.d) {
+        deltaX += 1;
+      }
+      if ((x <= 0 && deltaX < 0) || (x >= 100 && deltaX > 0)){
+        deltaX = 0;
+      }
+      if ((y <= 0 && deltaY < 0) || (y >= 100 && deltaY > 0)){
+        deltaY = 0;
+      }
+      if (deltaX != 0) x = this.state.x + (deltaX/(Math.abs(deltaX) + Math.abs(deltaY)));
+      if (deltaY != 0) y = this.state.y + (deltaY/(Math.abs(deltaX) + Math.abs(deltaY)));
+      if (x != this.state.x || y != this.state.y) this.setState({x, y});
+      this.updateMonster();
+    }}
 
   checkForEndGame() {
     // check if dead, or if win conditions are met
@@ -90,11 +94,20 @@ class GameScreen extends React.Component {
   }
 
   endGame(condition = "pause") {
-    clearInterval(this.state.interval);
-    if (condition == "win") {
-      console.log('You win!');
+    if (condition == "pause" && !(this.state.interval || this.state.gameOver)) {
+      this.setState({interval: this.startGame()});
+    } else {
+      clearInterval(this.state.interval);
+      this.setState({interval: undefined});
+      if (condition == "win") {
+        console.log('You win!');
+      } else if (condition == "lose") {
+        console.log('You lose!');
+      }
     }
   }
+
+
 
   prepGame() {
     this.renderChests();

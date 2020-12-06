@@ -282,7 +282,7 @@ class GameScreen extends React.Component {
 
   render() {
     return (
-      <div className="GameScreen" style={{ position: "relative" }}>
+      <div className="GameScreen" style={{ position: "relative", top: "0px" }}>
         <button onClick={() => this.endGame()}>Pause</button>
         <p>Game</p>
         <div 

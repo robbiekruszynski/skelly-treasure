@@ -303,9 +303,7 @@ class GameScreen extends React.Component {
     // update monster state to track player, absolute value change of pixel distance being the monsterSpeed
     let deltaX = Math.round(this.state.x - this.state.monsterX);
     let deltaY = Math.round(this.state.y - this.state.monsterY);
-    let magnitudeVector = [Math.abs(deltaX), Math.abs(deltaY)];
-    let magnitude = magnitudeVector[0] + magnitudeVector[1];
-    let sign = [deltaX == 0 ? 0 : Math.round(deltaX / magnitudeVector[0]), deltaY == 0 ? 0 : Math.round(deltaY / magnitudeVector[0])]
+    let magnitude = Math.abs(deltaX) + Math.abs(deltaY);
     let ratio = magnitude == 0 ? [0,0] : [deltaX/magnitude, deltaY/magnitude];
     let newMonsterX = this.state.monsterX + ratio[0] * this.state.monsterSpeed;
     let newMonsterY = this.state.monsterY + ratio[1] * this.state.monsterSpeed;

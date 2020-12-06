@@ -244,14 +244,21 @@ class GameScreen extends React.Component {
       }
     }
     if (correct) {
-      let chestList = [...this.state.chestsClosed];
-      chestList[this.state.currentChest] = false;
-      document.getElementById(`chest${this.state.currentChest}`).innerHTML = '|X|';
+      this.handleCorrectAnswer();
       this.setState({flashMessage: "Correct!"});
     } else {
       this.setState({flashMessage: "Incorrect answers detected, or correct answers missing."});
     }
     this.exitQuestion();
+  }
+
+  handleCorrectAnswer() {
+    let chestList = [...this.state.chestsClosed];
+    chestList[this.state.currentChest] = false;
+    document.getElementById(`chest${this.state.currentChest}`).innerHTML = '|X|';
+    this.setState({chestsClosed: chestList });
+    this.updateMonster(-100);
+    this.setState({monsterSpeed: this.state.monsterSpeed + 0.1})
   }
   
   positionChar() {
@@ -304,14 +311,14 @@ class GameScreen extends React.Component {
     this.setState({charPosition: shiftedPos});
   }
 
-  updateMonster() {
+  updateMonster(direction = 1) {
     // update monster state to track player, absolute value change of pixel distance being the monsterSpeed
     let deltaX = Math.round(this.state.x - this.state.monsterX);
     let deltaY = Math.round(this.state.y - this.state.monsterY);
     let magnitude = Math.abs(deltaX) + Math.abs(deltaY);
     let ratio = magnitude == 0 ? [0,0] : [deltaX/magnitude, deltaY/magnitude];
-    let newMonsterX = this.state.monsterX + ratio[0] * this.state.monsterSpeed;
-    let newMonsterY = this.state.monsterY + ratio[1] * this.state.monsterSpeed;
+    let newMonsterX = this.state.monsterX + direction * ratio[0] * this.state.monsterSpeed;
+    let newMonsterY = this.state.monsterY + direction * ratio[1] * this.state.monsterSpeed;
     this.setState({monsterX: newMonsterX, monsterY: newMonsterY});
   }
 

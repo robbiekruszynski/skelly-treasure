@@ -84,10 +84,16 @@ class GameScreen extends React.Component {
 
   checkForEndGame() {
     // check if dead, or if win conditions are met
+    if (this.state.chestsClosed.filter((a) => a).length == 0) {
+      this.endGame("win");
+    }
   }
 
-  endGame() {
+  endGame(condition = "pause") {
     clearInterval(this.state.interval);
+    if (condition == "win") {
+      console.log('You win!');
+    }
   }
 
   prepGame() {

@@ -14,7 +14,7 @@ class GameScreen extends React.Component {
       s: false,
       monsterX: 50,
       monsterY: 90,
-      monsterSpeed: 0.5,
+      monsterSpeed: 0.25,
       monsterAvatar: "<0_0>",
       mostRecentHorizontal: 'none',
       mostRecentVertical: 'none',
@@ -45,6 +45,7 @@ class GameScreen extends React.Component {
 
   startGame() {
     return setInterval(() => {
+      this.checkForEndGame();
       let x;
       let y;
       if (this.state.moving) {
@@ -72,12 +73,16 @@ class GameScreen extends React.Component {
         }
         if (x) this.setState({x});
         if (y) this.setState({y});
+        this.updateMonster();
       }
       let timer = this.state.timer + 1;
       this.setState({timer})
       this.positionChar();
-      this.updateMonster();
     }, 50);
+  }
+
+  checkForEndGame() {
+    // check if dead, or if win conditions are met
   }
 
   endGame() {
@@ -295,8 +300,12 @@ class GameScreen extends React.Component {
 
   updateMonster() {
     // update monster state to track player, absolute value change of pixel distance being the monsterSpeed
-    let deltaX = this.state.x - this.state.monsterX;
-    let deltaY = this.state.y - this.state.monsterY;
+    let deltaX = Math.round(this.state.x - this.state.monsterX);
+    let deltaY = Math.round(this.state.y - this.state.monsterY);
+    let sign = [deltaX == 0 ? 0 : Math.round(deltaX / Math.abs(deltaX)), deltaY == 0 ? 0 : Math.round(deltaY / Math.abs(deltaY))]
+    let newMonsterX = this.state.monsterX + sign[0] * this.state.monsterSpeed;
+    let newMonsterY = this.state.monsterY + sign[1] * this.state.monsterSpeed;
+    this.setState({monsterX: newMonsterX, monsterY: newMonsterY});
   }
 
   render() {

@@ -14,6 +14,7 @@ class GameScreen extends React.Component {
       s: false,
       monsterX: 50,
       monsterY: 10,
+      monsterSpeed: 0.5,
       monsterAvatar: "<0_0>",
       mostRecentHorizontal: 'none',
       mostRecentVertical: 'none',
@@ -67,6 +68,7 @@ class GameScreen extends React.Component {
       let timer = this.state.timer + 1;
       this.setState({timer})
       this.positionChar();
+      this.updateMonster();
     }, 50);
   }
 
@@ -281,6 +283,10 @@ class GameScreen extends React.Component {
     // I just think this looks *cool*
     let shiftedPos = position[outputNum].slice(Math.floor(this.state.timer / 4) % position[outputNum].length) + position[outputNum].slice(0,Math.floor(this.state.timer / 4) % position[outputNum].length)
     this.setState({charPosition: shiftedPos});
+  }
+
+  updateMonster() {
+    // update monster state to track player, absolute value change of pixel distance being the monsterSpeed
   }
 
   render() {

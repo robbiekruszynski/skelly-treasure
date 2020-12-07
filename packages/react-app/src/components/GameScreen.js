@@ -90,7 +90,18 @@ class GameScreen extends React.Component {
     // check if dead, or if win conditions are met
     if (this.state.chestsClosed.filter((a) => a).length == 0) {
       this.endGame("win");
+    } else if (this.touching()) {
+      this.endGame("lose");
     }
+  }
+
+  touching() {
+    const windowSize = [window.innerWidth, window.innerHeight];
+    const charDiv = document.getElementById("charDiv");
+    const monsterDiv = document.getElementById("monsterDiv");
+    const charVals = [windowSize[0] * parseInt(charDiv.style.left)/100, windowSize[1] * parseInt(charDiv.style.bottom)/100];
+    const monsterVals = [windowSize[0] * parseInt(monsterDiv.style.left)/100, windowSize[1] * parseInt(monsterDiv.style.bottom)/100];
+    return (Math.abs((monsterVals[0] - charVals[0])) <= 75 && Math.abs((monsterVals[1] - charVals[1])) <= 75);
   }
 
   endGame(condition = "pause") {
@@ -101,8 +112,10 @@ class GameScreen extends React.Component {
       this.setState({interval: undefined});
       if (condition == "win") {
         console.log('You win!');
+        this.setState({gameOver: true});
       } else if (condition == "lose") {
         console.log('You lose!');
+        this.setState({gameOver: true});
       }
     }
   }

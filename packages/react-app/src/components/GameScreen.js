@@ -6,18 +6,25 @@ class GameScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      flashMessage: "Move with WASD, Open chests with Space, Answer questions to kill the monster!",
       x: 50,
       y: 50,
       a: false,
       d: false,
       w: false,
       s: false,
+      monsterX: 50,
+      monsterY: 90,
+      monsterSpeed: 0.25,
+      monsterAvatar: "<0_0>",
       mostRecentHorizontal: 'none',
       mostRecentVertical: 'none',
       charPosition: '',
       interval: this.startGame(),
+      gameOver: false,
       timer: 0,
       numChests: 10,
+      currentChest: undefined,
       moving: true,
       prompts: [],
       choices: [],
@@ -41,35 +48,79 @@ class GameScreen extends React.Component {
 
   startGame() {
     return setInterval(() => {
-      let x;
-      let y;
-      if (this.state.moving) {
-        if (this.state.a) {
-          x = this.state.x - 1;
-          this.setState({x});
-        }
-        if (this.state.w) {
-          y = this.state.y + 1;
-          this.setState({y});
-        }
-        if (this.state.s) {
-          y = this.state.y - 1;
-          this.setState({y});
-        }
-        if (this.state.d) {
-          x = this.state.x + 1;
-          this.setState({x});
-        }
-      }
+      this.checkForEndGame();
+      this.handleMovement();
       let timer = this.state.timer + 1;
       this.setState({timer})
       this.positionChar();
-    }, 50);
+    }, 33);
   }
 
-  endGame() {
-    clearInterval(this.state.interval);
+  handleMovement() {
+    let x = this.state.x;
+    let y = this.state.y;
+    let deltaX = 0;
+    let deltaY = 0;
+    if (this.state.moving) {
+      if (this.state.a) {
+        deltaX -= 1;
+      }
+      if (this.state.w) {
+        deltaY += 1;
+      }
+      if (this.state.s) {
+        deltaY -= 1;
+      }
+      if (this.state.d) {
+        deltaX += 1;
+      }
+      if ((x <= 0 && deltaX < 0) || (x >= 100 && deltaX > 0)){
+        deltaX = 0;
+      }
+      if ((y <= 0 && deltaY < 0) || (y >= 100 && deltaY > 0)){
+        deltaY = 0;
+      }
+      if (deltaX != 0) x = this.state.x + (deltaX/(Math.abs(deltaX) + Math.abs(deltaY)));
+      if (deltaY != 0) y = this.state.y + (deltaY/(Math.abs(deltaX) + Math.abs(deltaY)));
+      if (x != this.state.x || y != this.state.y) this.setState({x, y});
+      this.updateMonster();
+    }}
+
+  checkForEndGame() {
+    // check if dead, or if win conditions are met
+    if (this.state.chestsClosed.filter((a) => a).length == 0) {
+      this.endGame("win");
+    } else if (this.touching()) {
+      this.endGame("lose");
+    }
   }
+
+  touching() {
+    const windowSize = [window.innerWidth, window.innerHeight];
+    const charDiv = document.getElementById("charDiv");
+    const monsterDiv = document.getElementById("monsterDiv");
+    const charVals = [windowSize[0] * parseInt(charDiv.style.left)/100, windowSize[1] * parseInt(charDiv.style.bottom)/100];
+    const monsterVals = [windowSize[0] * parseInt(monsterDiv.style.left)/100, windowSize[1] * parseInt(monsterDiv.style.bottom)/100];
+    return (Math.abs((monsterVals[0] - charVals[0])) <= 75 && Math.abs((monsterVals[1] - charVals[1])) <= 75);
+  }
+
+  endGame(condition = "pause") {
+    if (condition == "pause" && !(this.state.interval || this.state.gameOver)) {
+      this.setState({interval: this.startGame()});
+    } else {
+      clearInterval(this.state.interval);
+      this.setState({interval: undefined});
+      if (condition == "win") {
+        console.log('You win!');
+        this.setState({gameOver: true});
+      } else if (condition == "lose") {
+        console.log('You lose!');
+        this.setState({gameOver: true});
+      }
+    }
+  }
+
+
 
   prepGame() {
     this.renderChests();
@@ -168,6 +219,7 @@ class GameScreen extends React.Component {
       let chest = document.querySelector(`#chest${i}`);
       // "87%" -- > 87
       if (Math.pow(Math.abs(parseInt(chest.style.left) - this.state.x), 2) + Math.pow(Math.abs(parseInt(chest.style.bottom) - this.state.y), 2) < Math.pow(5, 2) && this.state.chestsClosed[i]) {
+        this.setState({currentChest: i});
         this.startQuestion();
       }
     }
@@ -223,11 +275,20 @@ class GameScreen extends React.Component {
       }
     }
     if (correct) {
-      console.log("Correct!");
+      this.handleCorrectAnswer();
+      this.setState({flashMessage: "Correct -- The monster is stunned!"});
     } else {
-      console.log("Incorrect answers detected, or correct answers missing.");
+      this.setState({flashMessage: "Incorrect answers detected, or correct answers missing."});
     }
     this.exitQuestion();
+  }
+
+  handleCorrectAnswer() {
+    let chestList = [...this.state.chestsClosed];
+    chestList[this.state.currentChest] = false;
+    document.getElementById(`chest${this.state.currentChest}`).innerHTML = '|X|';
+    this.setState({chestsClosed: chestList });
+    this.knockAndStun();
   }
   
   positionChar() {
@@ -280,11 +341,29 @@ class GameScreen extends React.Component {
     this.setState({charPosition: shiftedPos});
   }
 
+  updateMonster(direction = 0) {
+    // update monster state to track player, absolute value change of pixel distance being the monsterSpeed
+    let deltaX = Math.round(this.state.x - this.state.monsterX);
+    let deltaY = Math.round(this.state.y - this.state.monsterY);
+    let magnitude = Math.abs(deltaX) + Math.abs(deltaY);
+    let ratio = magnitude == 0 ? [0,0] : [deltaX/magnitude, deltaY/magnitude];
+    let newMonsterX = this.state.monsterX + ratio[0] * (this.state.monsterSpeed + direction);
+    let newMonsterY = this.state.monsterY + ratio[1] * (this.state.monsterSpeed + direction);
+    this.setState({monsterX: newMonsterX, monsterY: newMonsterY});
+  }
+
+  knockAndStun() {
+    this.updateMonster(-10);
+    const monsterSpeed = this.state.monsterSpeed + 0.1;
+    this.setState({monsterSpeed: 0});
+    setTimeout(() => this.setState({monsterSpeed}), 1000);
+  }
+
   render() {
     return (
-      <div className="GameScreen" style={{ position: "relative" }}>
+      <div className="GameScreen" style={{ position: "relative"}}>
         <button onClick={() => this.endGame()}>Pause</button>
-        <p>Game</p>
+        <p style={{ margin: "0"}}>{this.state.flashMessage}</p>
         <div 
           id="questionModal"
           style={{
@@ -303,15 +382,35 @@ class GameScreen extends React.Component {
           <p onClick={() => this.checkAnswers()}>Submit</p>
         </div>
         <div
+          id="monsterDiv"
+          style={{
+            position: "absolute",
+            left: `${Math.floor(this.state.monsterX)}%`,
+            bottom: `${Math.floor(this.state.monsterY)}%`,
+            width: "100px",
+            height: "100px",
+            border: "1px solid red"
+          }}
+        >
+          <p>{this.state.monsterAvatar}</p>
+        </div>
+        <div
           id="charDiv"
           style={{
             position: "absolute",
-            left: `${this.state.x}%`,
-            bottom: `${this.state.y}%`,
+            left: `${Math.floor(this.state.x)}%`,
+            bottom: `${Math.floor(this.state.y)}%`,
             width: "100px",
+            height: "100px",
+            border: "1px solid blue"
           }}
         >
-          <img src={logo} alt="" />
+          <img 
+            src={logo} 
+            alt="" 
+            style={{
+              width: "100%",
+            }}/>
           <p>{this.state.charPosition}</p>
         </div>
       </div>

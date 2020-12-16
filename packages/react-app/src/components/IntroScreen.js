@@ -11,12 +11,21 @@ import {
 
 export const IntroScreen = ({ history }) => {
   let ethereum = window.ethereum;
+ethereum.enable();
+
+  const handleClick = () => {
+let ethereum = window.ethereum.enable()
+  }
 
   return (
     <div className="MainContainer">
       <NavBar />
+    
       <div className="IntroBody">
+        <div className = "IntroTitle">
         <p>Skelly Treasure</p>
+        </div>
+   
         <Link>
           <button
             onClick={() => {
@@ -29,8 +38,9 @@ export const IntroScreen = ({ history }) => {
             variant="contained"
             color="primary"
             // class="enableEthereumButton"
-            onClick={() => ethereum.enable()}
+            onClick={() => handleClick}
           >
+
             Wallet Check
           </button>
         </Link>

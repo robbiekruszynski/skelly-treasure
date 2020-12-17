@@ -2,6 +2,7 @@ import React from "react";
 import { ethers } from "ethers";
 import "./IntroScreen.scss";
 import NavBar from "./NavBar";
+
 import {
   BrowserRouter as Router,
   Link,

@@ -26,7 +26,8 @@ let ethereum = window.ethereum.enable()
         <div className = "IntroTitle">
         <p>Skelly Treasure</p>
         </div>
-   
+        <div className = "IntroButtons">
+
         <Link>
           <button
             onClick={() => {
@@ -45,6 +46,7 @@ let ethereum = window.ethereum.enable()
             Wallet Check
           </button>
         </Link>
+        </div>
       </div>
     </div>
   );

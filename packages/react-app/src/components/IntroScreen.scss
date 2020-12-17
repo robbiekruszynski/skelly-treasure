@@ -37,18 +37,23 @@
     display: flex;
     width: 50%;
     // border: 1px solid red;
+    flex-direction: row;
     justify-content: space-around;
     margin-top: 30%;
-    button {
-      margin-left: 50px;
-      margin-right: 50px;
-      background-color: white;
+    margin-left: 30%;
+    margin-right: 30%;
 
-      &:hover {
-        background-color: grey;
-        color: white;
-        cursor: pointer;
-      }
+    //   margin-right: 10%;
+    //   background-color: white;
+    // button {
+    //   margin-left: 10%;
+    //   margin-right: 10%;
+    //   background-color: white;
+
+    button &:hover {
+      color: white;
+      cursor: pointer;
     }
+    // }
   }
 }
